@@ -3,7 +3,8 @@ const express =require ('express');
 const exphbs=require('express-handlebars');
 //init app
 const app=express();
-
+//load Files
+const keys=require('./config/keys');
 //setup view engine
 app.engine('handlebars', exphbs({
     defaultLayout: 'main'
