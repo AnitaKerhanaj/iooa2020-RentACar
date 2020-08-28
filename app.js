@@ -14,7 +14,7 @@ app.set('view engine', 'handlebars');
 app.use(express.static('public'));
 
 //create port
-const port=3000;
+const port= process.env.PORT || 3000;
 //handle home route
 app.get('/',(req,res)=>{
     res.render('home');
