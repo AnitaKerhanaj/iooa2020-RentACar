@@ -2,11 +2,18 @@
 const express =require ('express');
 const exphbs=require('express-handlebars');
 const mongoose=require('mongoose');
+const bodyParser=require('body-parser');
 //init app
 const app=express();
+//setup body parser middleware
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json());
+
 //load Files
 const keys=require('./config/keys');
+//load collections
 const User=require('./models/user');
+const Contact=require('./models/contact');
 
 //connect to MongoDB
 mongoose.connect(keys.MongoDB,{
@@ -38,6 +45,21 @@ app.get('/about',(req,res)=>{
 app.get('/contact', (req,res)=>{
     res.render('contact', {
         title: 'Contact Us'
+    });
+});
+//save contact form data
+app.post('/contact', (req,res)=>{
+    console.log(req.body);
+    const newContact={
+        name: req.user._id,
+        message: req.body.message
+    }
+    new Contact (newContact).save((err,user)=>{
+        if(err){
+            throw err;
+        }else{
+            console.log('We received message from user', user);
+        }
     });
 });
 app.get('/signup', (req,res)=>{
