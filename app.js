@@ -1,10 +1,20 @@
 //load modules
 const express =require ('express');
 const exphbs=require('express-handlebars');
+const mongoose=require('mongoose');
 //init app
 const app=express();
 //load Files
 const keys=require('./config/keys');
+const User=require('./models/user');
+
+//connect to MongoDB
+mongoose.connect(keys.MongoDB,{
+    useNewUrlParser: true
+},() =>{
+    console.log('MongoDB is connected...');
+});
+
 //setup view engine
 app.engine('handlebars', exphbs({
     defaultLayout: 'main'
