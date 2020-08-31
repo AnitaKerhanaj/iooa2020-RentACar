@@ -3,12 +3,25 @@ const express =require ('express');
 const exphbs=require('express-handlebars');
 const mongoose=require('mongoose');
 const bodyParser=require('body-parser');
+const session=require('express-session');
+const cookieParser=require('cookie-parser');
+const passport=require('passport');
+const bcrypt=require('bcryptjs');
 //init app
 const app=express();
 //setup body parser middleware
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
+//configuration for Authentication
+app.use(cookieParser());
+app.use(session({
+    secret:'mysecret',
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 //load Files
 const keys=require('./config/keys');
 //load collections
@@ -66,6 +79,56 @@ app.get('/signup', (req,res)=>{
     res.render('signupForm', {
         title: 'Register'
     });
+});
+app.post('/signup', (req,res)=>{
+    console.log(req.body);
+    let errors=[];
+    if(req.body.password !== req.body.password2){
+        errors.push({text: 'Passport does not match'});
+    }
+    if(req.body.password.length <5){
+        errors.push({text:'Password must be at least 5 characters'});
+    }
+    if(errors.length>0){
+        res.render('signupForm', {
+            errors:errors,
+            firstname:req.body.firstname,
+            lastname: req.body.lastname,
+            password: req.body.password,
+            password2: req.body.password2,
+            email: req.body.email
+        })
+    }else{
+        User.findOne({email:req.body.email})
+        .then((user)=>{
+            if(user){
+                let errors=[];
+                errors.push({text: 'Email already exist!'});
+                res.render('signupForm',{
+                    errors:errors
+                });
+            }else{
+                //encrypt pass
+                let salt=bcrypt.genSaltSync(10);
+                let hash=bcrypt.hashSync(req.body.password,salt);
+
+                const newUser={
+                    firstname: req.body.firstname,
+                    lastname:req.body.lastname,
+                    email: req.body.email,
+                    password: hash
+                }
+                new User(newUser).save((err,user)=>{
+                    if(err){
+                        throw err;
+                    }
+                    if(user){
+                        console.log("New user is created");
+                    }
+                })
+            }
+        })
+    }
 });
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
