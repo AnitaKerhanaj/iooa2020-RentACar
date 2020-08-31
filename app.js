@@ -22,6 +22,8 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+//load passport
+require('./passport/local');
 //load Files
 const keys=require('./config/keys');
 //load collections
@@ -105,7 +107,12 @@ app.post('/signup', (req,res)=>{
                 let errors=[];
                 errors.push({text: 'Email already exist!'});
                 res.render('signupForm',{
-                    errors:errors
+                    errors:errors,
+                    firstname:req.body.firstname,
+                    lastname: req.body.lastname,
+                    password: req.body.password,
+                    password2: req.body.password2,
+                    email: req.body.email
                 });
             }else{
                 //encrypt pass
@@ -123,13 +130,24 @@ app.post('/signup', (req,res)=>{
                         throw err;
                     }
                     if(user){
-                        console.log("New user is created");
+                        let success=[];
+                        success.push({text: 'You successfully created an account! You can login now'});
+                        res.render('loginForm', {
+                            success:success
+                        })
                     }
                 })
             }
         })
     }
 });
+app.get('/displayLoginForm', (req,res)=> {
+    res.render('loginForm');
+});
+app.post('/login', passport.authenticate('local',{
+    successRedirect:'/profile',
+    failureRedirect: '/loginErrors'
+}));
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
 });
