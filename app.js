@@ -148,6 +148,15 @@ app.post('/login', passport.authenticate('local',{
     successRedirect:'/profile',
     failureRedirect: '/loginErrors'
 }));
+//display profile
+app.get('/profile', (req,res)=>{
+    User.findById({_id:req.user._id})
+    .then((user)=>{
+        res.render('profile', {
+            user:user
+        });
+    });
+});
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
 });
