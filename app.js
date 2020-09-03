@@ -32,6 +32,7 @@ const Contact=require('./models/contact');
 
 //connect to MongoDB
 mongoose.connect(keys.MongoDB,{
+    useUnifiedTopology: true,
     useNewUrlParser: true
 },() =>{
     console.log('MongoDB is connected...');
