@@ -158,6 +158,14 @@ app.get('/profile', (req,res)=>{
         });
     });
 });
+// Error kod prijave
+app.get('/loginErrors', (req,res)=>{
+    let errors=[];
+    errors.push({text:'User not found or password incorrect'});
+    res.render('loginForm',{
+        errors:errors.toObject
+    });
+});
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
 });
