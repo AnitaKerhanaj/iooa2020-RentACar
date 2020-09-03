@@ -27,7 +27,14 @@ const userSchema=new Schema({
     date: {
         type: Date,
         default: Date.now
-    }
+    },
+}, {
+    toObject: {
+        virtuals:true,
+    },
+    toJSON:{
+        virtuals: true,
+    },
 });
 
 module. exports=mongoose.model('User', userSchema);

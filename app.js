@@ -154,7 +154,7 @@ app.get('/profile', (req,res)=>{
     User.findById({_id:req.user._id})
     .then((user)=>{
         res.render('profile', {
-            user:user
+            user:user.toObject(),
         });
     });
 });
