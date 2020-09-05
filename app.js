@@ -22,8 +22,16 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+//load helpers
+const{requireLogin,ensureGuest}=require('./helpers/authHelper');
 //load passport
 require('./passport/local');
+//make user as a global object
+app.use((req,res, next)=>{
+    res.locals.user=req.user || null;
+    next();
+})
+
 //load Files
 const keys=require('./config/keys');
 //load collections
@@ -50,21 +58,21 @@ app.use(express.static('public'));
 //create port
 const port= process.env.PORT || 3000;
 //handle home route
-app.get('/',(req,res)=>{
+app.get('/',ensureGuest,(req,res)=>{
     res.render('home');
 });
-app.get('/about',(req,res)=>{
+app.get('/about',ensureGuest,(req,res)=>{
     res.render('about',{
         title: 'About'
     });
 });
-app.get('/contact', (req,res)=>{
+app.get('/contact',requireLogin, (req,res)=>{
     res.render('contact', {
         title: 'Contact Us'
     });
 });
 //save contact form data
-app.post('/contact', (req,res)=>{
+app.post('/contact',requireLogin, (req,res)=>{
     console.log(req.body);
     const newContact={
         name: req.user._id,
@@ -78,12 +86,12 @@ app.post('/contact', (req,res)=>{
         }
     });
 });
-app.get('/signup', (req,res)=>{
+app.get('/signup',ensureGuest,(req,res)=>{
     res.render('signupForm', {
         title: 'Register'
     });
 });
-app.post('/signup', (req,res)=>{
+app.post('/signup',ensureGuest, (req,res)=>{
     console.log(req.body);
     let errors=[];
     if(req.body.password !== req.body.password2){
@@ -142,19 +150,22 @@ app.post('/signup', (req,res)=>{
         })
     }
 });
-app.get('/displayLoginForm', (req,res)=> {
-    res.render('loginForm');
+app.get('/displayLoginForm',ensureGuest, (req,res)=> {
+    res.render('loginForm',{
+        title: 'Login'
+    });
 });
 app.post('/login', passport.authenticate('local',{
     successRedirect:'/profile',
     failureRedirect: '/loginErrors'
 }));
 //display profile
-app.get('/profile', (req,res)=>{
+app.get('/profile',requireLogin, (req,res)=>{
     User.findById({_id:req.user._id})
     .then((user)=>{
         res.render('profile', {
             user:user.toObject(),
+            title: 'Profile'
         });
     });
 });
@@ -163,9 +174,40 @@ app.get('/loginErrors', (req,res)=>{
     let errors=[];
     errors.push({text:'User not found or password incorrect'});
     res.render('loginForm',{
-        errors:errors.toObject
+        errors:errors.toObject,
+        title: 'Error'
     });
 });
+
+//list a car route
+app.get('/listCar',requireLogin, (req,res)=>{
+    res.render('listCar', {
+        title: 'Listing'
+    });
+});
+app.post('/listCar', requireLogin, (req,res)=>{
+    console.log(req.body);
+    res.render('listCar2', {
+        title: 'Finish'
+    });
+});
+//logout
+app.get('/logout', (req,res)=>{
+    User.findById({_id:req.user._id})
+    .then((user)=>{
+        user.online=false;
+        user.save((err,user)=> {
+            if(err){
+                throw err;
+            }
+            if(user){
+                req.logout();
+                res.redirect('/');
+            }
+        });
+    });
+});
+
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
 });
