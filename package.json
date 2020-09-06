@@ -9,13 +9,17 @@
   "author": "Anita Kerhanaj",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.747.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-handlebars": "^5.1.0",
     "express-session": "^1.17.1",
+    "formidable": "^1.2.2",
     "mongoose": "^5.10.2",
+    "multer": "^1.4.2",
+    "multer-s3": "^2.9.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
   },

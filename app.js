@@ -7,6 +7,7 @@ const session=require('express-session');
 const cookieParser=require('cookie-parser');
 const passport=require('passport');
 const bcrypt=require('bcryptjs');
+const formidable=require('formidable');
 //init app
 const app=express();
 //setup body parser middleware
@@ -24,6 +25,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 //load helpers
 const{requireLogin,ensureGuest}=require('./helpers/authHelper');
+const {upload}=require('./helpers/aws');
 //load passport
 require('./passport/local');
 //make user as a global object
@@ -37,6 +39,7 @@ const keys=require('./config/keys');
 //load collections
 const User=require('./models/user');
 const Contact=require('./models/contact');
+const Car=require('./models/car');
 
 //connect to MongoDB
 mongoose.connect(keys.MongoDB,{
@@ -186,11 +189,68 @@ app.get('/listCar',requireLogin, (req,res)=>{
     });
 });
 app.post('/listCar', requireLogin, (req,res)=>{
-    console.log(req.body);
-    res.render('listCar2', {
-        title: 'Finish'
-    });
+    const newCar={
+        owner: req.user._id,
+        make: req.body.make,
+        model: req.body.model,
+        year: req.body.year,
+        type: req.body.type
+    }
+    new Car(newCar).save((err,car)=>{
+        if(err){
+            throw err;
+        }
+        if (car){
+            res.render('listCar2', {
+                title: 'Finish',
+                car:car.toObject()
+            });
+        }
+    })
+    
 });
+app.post('/listCar2',requireLogin, (req,res)=>{
+    Car.findOne({_id:req.body.carID,owner:req.user._id})
+    .then ((car)=>{
+        car.pricePerHour=req.body.pricePerHour;
+        car.pricePerWeek=req.body.pricePerWeek;
+        car.location=req.body.location;
+        car.image=`https://rental-app.s3.eu-west-2.amazonaws.com/${req.body.image}`;
+        car.save((err,car)=>{
+            if(err){
+                throw err;
+            }
+            if(car){
+                res.redirect('/showCars');
+            }
+        })
+    })
+});
+app.get('/showCars', requireLogin, (req,res)=>{
+    Car.find({})
+    .populate('owner')
+    .sort({date:'desc'})
+    .then((cars)=>{
+        res.render('showCars', {
+            cars:cars.toObject()
+        })
+    })
+})
+//receive image
+app.post('/uploadImage', requireLogin,upload.any(),(req,res) => {
+    const form = new formidable.IncomingForm();
+    form.on('file', (field,file)=>{
+        console.log(file);
+    });
+    form.on('error', (err) => {
+        console.log(err);
+    });
+    form.on('end', () => {
+        console.log('Image recieved successfully...');
+    });
+    form.parse(req);
+});
+
 //logout
 app.get('/logout', (req,res)=>{
     User.findById({_id:req.user._id})

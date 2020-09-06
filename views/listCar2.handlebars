@@ -2,24 +2,26 @@
     <div class="col-sm"></div>
     <div class="col-sm-5">
         <form action="/listCar2" method="POST">
+        <input type="hidden" name="carID" value="{{car._id}}">
 
             <div class="form-group">
                 <label for="pricePerHour">Price per hour</label>
-                <input type="number" name="pricePerHour" id="pricePerHour" class="form-control">
+                <input type="number" name="pricePerHour" id="pricePerHour" class="form-control" required>
             </div>
 
             <div class="form-group">
                 <label for="pricePerWeek">Price per week</label>
-                <input type="number" name="pricePerWeek" id="pricePerWeek" class="form-control">
+                <input type="number" name="pricePerWeek" id="pricePerWeek" class="form-control" required>
             </div>
 
             <div class="form-group">
                 <label for="location">Location</label>
-                <input type="text" name="location" id="location" class="form-control" placeholder="street, city, state and zipcode">
+                <input type="text" name="location" id="location" class="form-control" placeholder="street, city, state and zipcode" required>
             </div>
 
             <div class="form-group">
-                <input type="file" name="image" id="image">
+                <button class="btn btn-info upload-btn" type="button">Choose image</button>
+                <input type="file" name="image" id="upload-input" style="display: none;" required>
             </div>
 
             <div class="form-group">
@@ -32,10 +34,36 @@
     <div class="col-sm"></div>
 </div>
 <script>
+    //fetch locatiob using javascript
 function fetchLocation(){
     var location=document.getElementById('location');
     var autoComplete=new google.maps.places.Autocomplete(location);
-}
+};
+//jquery kod tu počinje
+$(document).ready(function){
+    $('.upload-btn').on('click',function(){
+        $('#upload-input').click();
+    });
+    $('#upload-input').on('change', function(){
+        var uploadInput=$('#upload-input');
+        if (uploadInput.val() != ''){
+            var formData=new FormData();
+            formData.append('image',uploadInput[0].files[0]);
+
+            //make ajax request za slanje slike u bazu
+            $.ajax({
+                url: 'uploadImage',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(){
+                    uploadInput.val('');
+                }
+            });
+        };
+    });
+};
 </script>
 
 <script 
