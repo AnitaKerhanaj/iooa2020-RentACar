@@ -1,4 +1,4 @@
-//load modules
+
 const express =require ('express');
 const exphbs=require('express-handlebars');
 const {allowInsecurePrototypeAccess}=require('@handlebars/allow-prototype-access');
@@ -10,13 +10,15 @@ const cookieParser=require('cookie-parser');
 const passport=require('passport');
 const bcrypt=require('bcryptjs');
 const formidable=require('formidable');
+const socketIO=require('socket.io');
+const http=require('http');
 //init app
 const app=express();
 //setup body parser middleware
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-//configuration for Authentication
+//konfiguracija za autentikaciju
 app.use(cookieParser());
 app.use(session({
     secret:'mysecret',
@@ -30,20 +32,20 @@ const{requireLogin,ensureGuest}=require('./helpers/authHelper');
 const {upload}=require('./helpers/aws');
 //load passport
 require('./passport/local');
-//make user as a global object
+//user kao globalni objekt
 app.use((req,res, next)=>{
     res.locals.user=req.user || null;
     next();
 })
 
-//load Files
+//load datoteka
 const keys=require('./config/keys');
-//load collections
+//load kolekcije
 const User=require('./models/user');
 const Contact=require('./models/contact');
 const Car=require('./models/car');
 
-//connect to MongoDB
+//povezivanje s bazom MongoDB
 mongoose.connect(keys.MongoDB,{
     useUnifiedTopology: true,
     useNewUrlParser: true
@@ -51,16 +53,16 @@ mongoose.connect(keys.MongoDB,{
     console.log('MongoDB is connected...');
 });
 
-//setup view engine
+//prikaz
 app.engine('handlebars', exphbs({
     handlebars: allowInsecurePrototypeAccess(handlebars)
 }));
 app.set('view engine', 'handlebars');
 
-// connect client side to serve css and js files
+//spajanje klijentske strane za css i js
 app.use(express.static('public'));
 
-//create port
+//kreiranje porta
 const port= process.env.PORT || 3000;
 //handle home route
 app.get('/',ensureGuest,(req,res)=>{
@@ -76,7 +78,7 @@ app.get('/contact',requireLogin, (req,res)=>{
         title: 'Contact Us'
     });
 });
-//save contact form data
+//spremanje kontakta
 app.post('/contact',requireLogin, (req,res)=>{
     console.log(req.body);
     const newContact={
@@ -87,7 +89,7 @@ app.post('/contact',requireLogin, (req,res)=>{
         if(err){
             throw err;
         }else{
-            console.log('We received message from user', user);
+            console.log('Zaprimili smo poruku od korisnika', user);
         }
     });
 });
@@ -100,10 +102,10 @@ app.post('/signup',ensureGuest, (req,res)=>{
     console.log(req.body);
     let errors=[];
     if(req.body.password !== req.body.password2){
-        errors.push({text: 'Passport does not match'});
+        errors.push({text: 'Lozinke se ne podudaraju'});
     }
     if(req.body.password.length <5){
-        errors.push({text:'Password must be at least 5 characters'});
+        errors.push({text:'Lozinka mora sadržavati najmanje 5 znakova'});
     }
     if(errors.length>0){
         res.render('signupForm', {
@@ -129,7 +131,7 @@ app.post('/signup',ensureGuest, (req,res)=>{
                     email: req.body.email
                 });
             }else{
-                //encrypt pass
+                //encrypt lozinku
                 let salt=bcrypt.genSaltSync(10);
                 let hash=bcrypt.hashSync(req.body.password,salt);
 
@@ -145,7 +147,7 @@ app.post('/signup',ensureGuest, (req,res)=>{
                     }
                     if(user){
                         let success=[];
-                        success.push({text: 'You successfully created an account! You can login now'});
+                        success.push({text: 'Uspješno ste se registrirali! Prijavite se'});
                         res.render('loginForm', {
                             success:success
                         })
@@ -164,7 +166,7 @@ app.post('/login', passport.authenticate('local',{
     successRedirect:'/profile',
     failureRedirect: '/loginErrors'
 }));
-//display profile
+//profil
 app.get('/profile',requireLogin, (req,res)=>{
     User.findById({_id:req.user._id})
     .then((user)=>{
@@ -177,14 +179,14 @@ app.get('/profile',requireLogin, (req,res)=>{
 // Error kod prijave
 app.get('/loginErrors', (req,res)=>{
     let errors=[];
-    errors.push({text:'User not found or password incorrect'});
+    errors.push({text:'Korisnik nije pronađen ili je lozinka netočna'});
     res.render('loginForm',{
         errors:errors,
         title: 'Error'
     });
 });
 
-//list a car route
+//list a car
 app.get('/listCar',requireLogin, (req,res)=>{
     res.render('listCar', {
         title: 'Listing'
@@ -251,12 +253,12 @@ app.post('/uploadImage', requireLogin, upload.any(), (req,res) => {
         console.log(err);
     });
     form.on('end', () => {
-        console.log('Image recieved successfully...');
+        console.log('Slika uspješno primljena');
     });
     form.parse(req);
 });
 
-//logout
+//Odjava
 app.get('/logout', (req,res)=>{
     User.findById({_id:req.user._id})
     .then((user)=>{
@@ -272,7 +274,16 @@ app.get('/logout', (req,res)=>{
         });
     });
 });
-
-app.listen(port,()=>{
+//soket konekcija
+const server=http.createServer(app);
+const io=socketIO(server);
+io.on('connection', (socket)=> {
+    console.log('Povezan s klijentom');
+    //vi odspajanje
+    socket.on('disconnect', (socket)=>{
+        console.log("Odspajanje od klijenta");
+    });
+});
+server.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
 });
