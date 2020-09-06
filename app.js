@@ -1,6 +1,8 @@
 //load modules
 const express =require ('express');
 const exphbs=require('express-handlebars');
+const {allowInsecurePrototypeAccess}=require('@handlebars/allow-prototype-access');
+const handlebars=require('handlebars');
 const mongoose=require('mongoose');
 const bodyParser=require('body-parser');
 const session=require('express-session');
@@ -51,7 +53,7 @@ mongoose.connect(keys.MongoDB,{
 
 //setup view engine
 app.engine('handlebars', exphbs({
-    defaultLayout: 'main'
+    handlebars: allowInsecurePrototypeAccess(handlebars)
 }));
 app.set('view engine', 'handlebars');
 
@@ -167,7 +169,7 @@ app.get('/profile',requireLogin, (req,res)=>{
     User.findById({_id:req.user._id})
     .then((user)=>{
         res.render('profile', {
-            user:user.toObject(),
+            user:user,
             title: 'Profile'
         });
     });
@@ -177,7 +179,7 @@ app.get('/loginErrors', (req,res)=>{
     let errors=[];
     errors.push({text:'User not found or password incorrect'});
     res.render('loginForm',{
-        errors:errors.toObject,
+        errors:errors,
         title: 'Error'
     });
 });
@@ -203,19 +205,21 @@ app.post('/listCar', requireLogin, (req,res)=>{
         if (car){
             res.render('listCar2', {
                 title: 'Finish',
-                car:car.toObject()
+                car:car
             });
         }
     })
-    
 });
 app.post('/listCar2',requireLogin, (req,res)=>{
     Car.findOne({_id:req.body.carID,owner:req.user._id})
-    .then ((car)=>{
+    .then((car)=>{
+        let imageUrl={
+            imageUrl:`https://rentt-app.s3.amazonaws.com/${req.body.image}`
+        };
         car.pricePerHour=req.body.pricePerHour;
         car.pricePerWeek=req.body.pricePerWeek;
         car.location=req.body.location;
-        car.image=`https://rental-app.s3.eu-west-2.amazonaws.com/${req.body.image}`;
+        car.image.push(imageUrl);
         car.save((err,car)=>{
             if(err){
                 throw err;
@@ -232,12 +236,13 @@ app.get('/showCars', requireLogin, (req,res)=>{
     .sort({date:'desc'})
     .then((cars)=>{
         res.render('showCars', {
-            cars:cars.toObject()
+            cars:cars
         })
     })
 })
+
 //receive image
-app.post('/uploadImage', requireLogin,upload.any(),(req,res) => {
+app.post('/uploadImage', requireLogin, upload.any(), (req,res) => {
     const form = new formidable.IncomingForm();
     form.on('file', (field,file)=>{
         console.log(file);

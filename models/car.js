@@ -26,26 +26,12 @@ const carSchema=new Schema({
     },
     image: [{
         imageUrl: {
-            type:String
+            type: String
         }
     }],
-    location: [{
-            address: {
-                type: String
-            },
-            city: {
-                type: String
-            },
-            state: {
-                type: String
-            },
-            lat: {
-                type: Number
-            },
-            lng: {
-                type: Number
-            }
-        }],
+    location: {
+        type: String
+    },
         date: {
             type: Date,
             default: Date.now

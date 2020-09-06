@@ -6,14 +6,14 @@ const keys=require('../config/keys');
 aws.config.update({
     accessKeyId: keys.AWSAccessID,
     secretAccessKey: keys.AWSSecretKey,
-    region: 'eu-london-1'
+    region:'us-east-1'
 });
 
 const s3=new aws.S3({});
 const upload=multer({
     storage:multers3({
         s3:s3,
-        bucket: 'rental-app',
+        bucket: 'rentt-app',
         acl: 'public-read',
         metadata: (req,file,cb)=>{
             cb(null,{fieldName:file.fieldname});
@@ -22,8 +22,9 @@ const upload=multer({
             cb(null,file.originalname);
         },
         rename: (fieldName,fileName)=>{
-            return file.replace(/\+/g,'-').toLowerCase();
+            return fileName.replace(/\W+/g, '-').toLowerCase();
         }
     })
 });
 exports.upload=upload;
+
