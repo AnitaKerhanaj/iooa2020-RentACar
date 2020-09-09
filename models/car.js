@@ -43,6 +43,9 @@ const carSchema=new Schema({
         lng: {
             type: Number
             }
+    },
+    slikainfo: {
+        type: String
     }
 });
 module.exports=mongoose.model('Car',carSchema);
