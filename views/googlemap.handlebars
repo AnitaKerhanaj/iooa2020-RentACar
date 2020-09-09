@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+       /* Set the size of the div element that contains the map */
+      #map {
+        height: 600px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+       }
+    </style>
+  </head>
+  <body>
+    <h3>My Google Maps Demo</h3>
+    <!--The div element for the map -->
+    <div id="map"></div>
+    <script>
+        $(document).ready(
+                // Initialize and add the map
+                function initMap() {
+                // The location of Uluru
+                var Rijeka = {lat: 45.34306, lng: 14.40917};
+                // The map, centered at Uluru
+                var map = new google.maps.Map(
+                    document.getElementById('map'), {zoom: 8, center: Rijeka});
+                //load socket
+                var socket=io();
+                //prikaz svih azta
+                socket.on('allcars', function(cars){
+                        console.log('Svi auti', cars);
+                        //petlja kroz listu auta
+                        for(var i=0;i<cars.cars.length;i++){
+                            console.log(cars.cars[i]);
+                            //The marker, positioned at Uluru
+                            function addMarker(){
+                                var marker = new google.maps.Marker({
+                                   position: {
+                                     lat: cars.cars[i].coords.lat, 
+                                     lng: cars.cars[i].coords.lng
+                            },
+                            map: map
+                            });
+                            //info prozor o autu
+                            var infoProzor=new google.maps.InfoWindow({
+                              content: `<a href="/prikaziAuto/${cars.cars[i]._id}">
+                              <h3><b>${cars.cars[i].make}</b></h3>
+                              <p><b>Model:</b>${cars.cars[i].model}, <b>Godina:</b> ${cars.cars[i].year}</p>
+                              <p>Cijena po satu: ${cars.cars[i].pricePerHour} kn</p>
+                              <p>Cijena po tjednu: ${cars.cars[i].pricePerWeek} kn</p>
+                              </a>`
+                            });
+                            marker.addListener('click', function(){
+                              infoProzor.open(map,marker);
+                            })
+                        }
+                        addMarker();
+                        }
+                    });
+                })
+    </script>
+    <script defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAUNFl-_Gok4WjfUxFKCyx0lfgB9p3ZYbY&callback=initMap">
+    </script>
+  </body>
+</html>

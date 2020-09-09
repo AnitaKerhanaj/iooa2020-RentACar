@@ -32,9 +32,17 @@ const carSchema=new Schema({
     location: {
         type: String
     },
-        date: {
-            type: Date,
-            default: Date.now
-        }
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    coords: {
+        lat: {
+            type: Number
+            },
+        lng: {
+            type: Number
+            }
+    }
 });
 module.exports=mongoose.model('Car',carSchema);

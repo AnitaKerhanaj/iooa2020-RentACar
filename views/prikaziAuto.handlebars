@@ -1,0 +1,11 @@
+<div class="container">
+    <h1>{{car.make}}</h1>
+    <p>{{car.model}}</p>
+    <p>{{car.year}}</p>
+    <p>{{car.location}}</p>
+    {{#each car.image}}
+    <img src="{{imageUrl}}" alt="car image" width="300px">
+    {{else}}
+    <p>Nije pronađena slika</p>
+    {{/each}}
+</div>

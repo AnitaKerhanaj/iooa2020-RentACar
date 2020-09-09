@@ -44,6 +44,7 @@ const keys=require('./config/keys');
 const User=require('./models/user');
 const Contact=require('./models/contact');
 const Car=require('./models/car');
+const car = require('./models/car');
 
 //povezivanje s bazom MongoDB
 mongoose.connect(keys.MongoDB,{
@@ -274,11 +275,64 @@ app.get('/logout', (req,res)=>{
         });
     });
 });
+
+//google mapa
+app.get('/openGoogleMap', (req,res)=>{
+    res.render('googlemap');
+});
+//prikazi informacije o autu na infowindow
+app.get('/prikaziAuto/:id', (req,res)=>{
+    Car.findOne({_id:req.params.id}).then((car)=>{
+        res.render('prikaziAuto',{
+            car:car
+        });
+    }).catch((err)=>{console.log(err)});
+})
+
+
 //soket konekcija
 const server=http.createServer(app);
 const io=socketIO(server);
 io.on('connection', (socket)=> {
     console.log('Povezan s klijentom');
+    //object id event
+    socket.on('ObjectID',(oneCar)=>{
+        console.log('Jedan auto: ', oneCar);
+        Car.findOne({
+            owner: oneCar.userID,
+            _id: oneCar.carID
+        })
+        .then((car)=>{
+            socket.emit('car',car);
+        });
+    });
+    //pronalazak auta i slanje na mapu
+    Car.find({}).then((cars)=>{
+        socket.emit('allcars',{cars:cars});
+    }).catch((err)=>{
+        console.log(err);
+    });
+    //slušat event da uzme lat i lng
+    socket.on('LatLng', (data)=>{
+        console.log(data);
+        //pronac objekt auto i ažurirati širinu i dužinu zempljpisnu
+        Car.findOne({owner:data.car.owner})
+        .then((car)=>{
+            car.coords.lat=data.data.results[0].geometry.location.lat;
+            car.coords.lng=data.data.results[0].geometry.location.lng;
+            car.save((err,car)=>{
+                if(err){
+                    throw err;
+                }
+                if(car){
+                    console.log('Zemljopisna sirina i duzina su azurirane!')
+                }
+            })
+        }).catch((err)=>{
+            console.log(err);
+        });
+    });
+
     //vi odspajanje
     socket.on('disconnect', (socket)=>{
         console.log("Odspajanje od klijenta");
