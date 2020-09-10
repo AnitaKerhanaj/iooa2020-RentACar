@@ -1,22 +1,12 @@
-<div class="container">
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="card" style="width: 20rem;">
-                <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
-            </div>  
-        </div>
-            <div class="col-sm-4">
-                <div class="card-body">
-                    <h5 class="card-title">{{car.make}}</h5>
-                    <p class="card-text">Model: {{car.model}}, Godina: {{car.year}}, </car></p>
-                    <p class="card-text">Cijena po satu: {{car.model}}kn, Cijena po tjednu: {{car.year}}kn, </car></p>
-                    <small>Lokacija: {{car.location}}</small>
-                    <br>
-                </div>
-            <a href="/kontaktOwner/{{car.owner}}" class="btn btn-primary btn-1">Kontaktiraj vlasnika</a>
-            <br>
-            <a href="/RentCar/{{car._id}}" class="btn btn-danger btn-1">Rent a car</a>  
-            </div>
+<div class="media">
+  <img src="{{car.slikainfo}}" class="align-self-center mr-3" alt="...">
+  <div class="media-body">
+    <h5 class="card-title">Model: {{car.model}}, Godina: {{car.year}}</h5>
+    <p class="card-text">Cijena po satu: {{car.model}}kn, Cijena po tjednu: {{car.year}}kn</p>
+    <small>Lokacija: {{car.location}}</small>
+    <br>
+    <a href="/kontaktOwner/{{car.owner}}" class="btn btn-primary btn-1">Kontaktiraj vlasnika</a>
+    <br>
+    <a href="/RentCar/{{car._id}}" class="btn btn-danger btn-1">Rent a car</a> 
     </div>
 </div>
-
