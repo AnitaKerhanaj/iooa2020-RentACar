@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card" style="width: 18rem;">
+                <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{car.make}} {{car.model}}</h5>
+                    <p class="card-text">{{car.pricePerWeek}} /tjedan</p>
+                    <p class="card-text">{{car.pricePerHour}} /sat</p>
+                    <a href="/prikaziAuto/{{car._id}}" 
+                    class="btn btn-primary">Kontakt vlasnika</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <form action="/placanje/{{budjet._id}}" method="POST">
+            <script src="https://checkout.stripe.com/checkout.js"
+             data-key="{{StripePublishableKey}}" class="stripe-button" 
+             data-amount="{{stripeUkupno}}"
+             data-name="Car Rental" 
+             data-description="{{budjet.ukupno}} kn za iznajmljivanje {{car.make}} {{car.model}}"
+             data-image="/image/logo.png"></script>
+            <div class="form-group">
+                <label for="sat">Ukupan iznos je: {{budjet.ukupno}}kn</label>
+                <div class="form-group">
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
