@@ -1,0 +1,26 @@
+<div class="container">
+    <h1>Chat room</h1>
+    <ul id="list">
+        {{#each chat}}
+        {{#each dialogue}}
+        <h3>{{posiljatelj.firstname}}</h3>
+        <p>{{posiljateljPoruka}}</p>
+        <small>{{date}}</small>
+        <hr>
+        {{#if primateljPoruka}}
+        <h3>{{primatelj.firstname}}</h3>
+        <p>{{primateljPoruka}}</p>
+        <small>{{date}}</small>
+        {{else}}
+        {{/if}}
+        <hr>
+        {{/each}}
+        {{else}}
+        <p>Nema poruka</p>
+        {{/each}}  
+    </ul>
+    <form action="/chat/{{chat._id}}" method="POST">
+        <input type="text" name="poruka" class="form-control">
+        <button type="submit" class="btn btn-primary btn-1">Pošalji</button>
+    </form>
+</div>

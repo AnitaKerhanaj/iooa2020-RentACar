@@ -1,5 +1,7 @@
 //spajanje socket.io
 $(document).ready(function(){
+    //autoscroll funkcija
+    $('#list').animate({scrollTop:1000},800);
     var socket=io();
     //spajanje klijenta na server
     socket.on('connect', function(socket){

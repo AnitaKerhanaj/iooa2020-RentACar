@@ -1,4 +1,5 @@
 {{#each cars}}
+<a href="/prikaziAuto/{{_id}}">
 <div class="media">
   <input type="hidden" id="carID" value="{{_id}}">
   <img src={{owner.image}} class="mr-3"  width="64px" height="64px">
@@ -17,9 +18,9 @@
     <p><u>{{pricePerWeek}}</u> kn po tjednu</p>
     <small>{{location}}</small>
     <small>{{date}}</small>
-    
   </div>
-</div>
+  </div>
+</a>
 <hr>
 {{else}}
 <p>No car found</p>

@@ -45,6 +45,7 @@ const User=require('./models/user');
 const Contact=require('./models/contact');
 const Car=require('./models/car');
 const car = require('./models/car');
+const Chat=require('./models/chat');
 
 //povezivanje s bazom MongoDB
 mongoose.connect(keys.MongoDB,{
@@ -222,6 +223,7 @@ app.post('/listCar2',requireLogin, (req,res)=>{
         car.pricePerHour=req.body.pricePerHour;
         car.pricePerWeek=req.body.pricePerWeek;
         car.location=req.body.location;
+        car.slikainfo= `https://rentt-app.s3.amazonaws.com/${req.body.image}`;
         car.image.push(imageUrl);
         car.save((err,car)=>{
             if(err){
@@ -288,13 +290,106 @@ app.get('/prikaziAuto/:id', (req,res)=>{
         });
     }).catch((err)=>{console.log(err)});
 })
-
+//stranica profila vlasnika auta
+app.get('/kontaktOwner/:id',(req,res)=>{
+    User.findOne({_id:req.params.id})
+    .then((owner)=>{
+        res.render('vlasnikProfil',{
+            owner:owner
+        })
+    }).catch((err)=>{
+        console.log(err)});
+})
 
 //soket konekcija
 const server=http.createServer(app);
 const io=socketIO(server);
+//spajanje na kljenta
 io.on('connection', (socket)=> {
     console.log('Povezan s klijentom');
+    //handle chat room route
+    app.get('/chatVlasnik/:id', (req,res)=>{
+       Chat.findOne({posiljatelj:req.params.id, primatelj:req.user._id})
+       .then((chat)=>{
+           if(chat){
+               chat.date=new Date(),
+               chat.posiljateljProcitao= false;
+               chat.primateljProcitao=true;
+               chat.save()
+               .then((chat)=>{
+                   res.redirect(`/chat/${chat._id}`);
+               }).catch((err)=>{
+                   console.log(err)});
+           }else{
+               Chat.findOne({posiljatelj:req.user._id,primatelj:req.params.id})
+               .then((chat)=>{
+                        if(chat){
+                            chat.posiljateljProcitao=true;
+                            chat.primateljProcitao=false;
+                            chat.date=new Date()
+                            chat.save()
+                            .then((chat)=>{
+                                res.redirect(`/chat/${chat._id}`);
+                            }).catch((err)=>{console.log(err)});
+                        }else{
+                            const newChat={
+                                posiljatelj: req.user._id,
+                                primatelj: req.params.id,
+                                date: new Date()
+                            }
+                            new Chat(newChat).save().then((chat)=>{
+                                res.redirect(`/chat/${chat._id}`);
+                            }).catch((err)=>{ console.log(err)});
+                    }
+               }).catch((err)=>{console.log(err)});
+           }
+       }).catch((err)=>{console.log(err)});
+    });
+    //chat-id ruta
+    app.get('/chat/:id', (req,res)=>{
+        Chat.findOne({_id:req.params.id})
+        .populate('posiljatelj')
+        .populate('primatelj')
+        .populate('dialogue.posiljatelj')
+        .populate('dialogue.primatelj')
+        .then((chat)=>{
+            res.render('chatRoom',{
+                chat:chat
+            })
+        }).catch((err)=>{console.log(err)});
+    })
+    //POST zahtjev za /chat/id
+    app.post('/chat/:id', (req,res)=>{
+        Chat.findById({_id:req.params.id})
+        .populate('posiljatelj')
+        .populate('primatelj')
+        .populate('dialogue.posiljatelj')
+        .populate('dialogue.primatelj')
+        .then((chat)=>{
+            const newDialogue={
+                posiljatelj: req.user._id,
+                date: new Date(),
+                posiljateljPoruka: req.body.poruka
+            }
+            chat.dialogue.push(newDialogue)
+            chat.save((err,chat)=>{
+                if(err){
+                    console.log(err);
+                }
+                if(chat){
+                    Chat.findOne({_id:chat._id})
+                    .populate('posiljatelj')
+                    .populate('primatelj')
+                    .populate('dialogue.posiljatelj')
+                    .populate('dialogue.primatelj')
+                    .then((chat)=>{
+                        res.render('chatRoom',{chat:chat});
+                    }).catch((err)=>{console.log(err)});
+                }
+            })
+
+        }).catch((err)=>{console.log(err)});
+     })
     //object id event
     socket.on('ObjectID',(oneCar)=>{
         console.log('Jedan auto: ', oneCar);
@@ -304,7 +399,7 @@ io.on('connection', (socket)=> {
         })
         .then((car)=>{
             socket.emit('car',car);
-        });
+        }).catch((err)=>{console.log(err)});
     });
     //pronalazak auta i slanje na mapu
     Car.find({}).then((cars)=>{
