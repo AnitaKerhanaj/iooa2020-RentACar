@@ -1,6 +1,9 @@
 .center{
     text-align: center;
 }
+.mb-3{
+    margin-top: 10px;
+}
 .green{
     color: green;
 }
@@ -17,4 +20,10 @@
     width: 700PX;
     height: 400px;
     overflow: scroll;
+}
+.card-img-top{
+    margin-top: 20px;
+}
+.mr-3{
+    margin-top: 15px;
 }
