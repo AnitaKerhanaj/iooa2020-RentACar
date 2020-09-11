@@ -1,36 +1,28 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-4">
-            <div class="card" style="width: 18rem;">
+            <div class="card text-white bg-dark mb-3 card border-dark mb-3" style="width: 18rem;">
                 <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">{{car.make}} {{car.model}}</h5>
-                    <p class="card-text">{{car.pricePerWeek}} /tjedan</p>
-                    <p class="card-text">{{car.pricePerHour}} /sat</p>
+                    <p class="card-text">{{car.cijenaPoDanu}} /dan</p>
                     <a href="/prikaziAuto/{{car._id}}" 
                     class="btn btn-primary">Kontakt vlasnika</a>
                 </div>
             </div>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-4 card text-white bg-dark mb-3 card border-dark mb-3" style="max-width: 40rem;">
             <form action="/izracunajUkupno/{{car._id}}" method="POST">
             <div class="form-group">
-                <label for="sat">Koliko dugo želite iznajmiti automobil?</label>
-                <select name="sat" class="form-control">
-                    <option value="0">0 h</option>
-                    <option value="1">1 h</option>
-                    <option value="2">2 h</option>
-                    <option value="3">3 h</option>
-                    <option value="4">4 h</option>
-                    <option value="5">5 h</option>
+                <label for="dan">Koliko dugo želite iznajmiti automobil?</label>
+                <select name="dan" class="form-control">
+                    <option value="1">1 dana</option>
+                    <option value="2">2 dana</option>
+                    <option value="3">3 dana</option>
+                    <option value="4">4 dana</option>
+                    <option value="5">5 dana</option>
                 </select>
-                <select name="tjedan" class="form-control">
-                    <option value="0">0 tj</option>
-                    <option value="1">1 tj</option>
-                    <option value="2">2 tj</option>
-                    <option value="3">3 tj</option>
-                    <option value="4">4 tj</option>
-                </select>
+                
                 <div class="form-group">
                     <button type="submit" class="form-control btn btn-danger">Izracunaj ukupnu cijenu</button>
                 </div>

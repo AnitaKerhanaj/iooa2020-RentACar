@@ -1,14 +1,16 @@
-<div class="container card text-white bg-dark mb-3 card border-dark mb-3" >
-<div class="media">
-  <img src="{{car.slikainfo}}" class="align-self-center mr-3">
-  <div class="media-body">
-    <h5 class="card-title">Model: {{car.model}}, Godina: {{car.year}}</h5>
-    <p class="card-text">Cijena po satu: {{car.model}}kn, Cijena po tjednu: {{car.year}}kn</p>
-    <small>Lokacija: {{car.location}}</small>
+<div class="card text-white bg-dark mb-3">
+  
+  <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
+  <div class="card-body">
+    <h3 class="card-title text-center">{{car.make}}</h3>
+    <h5 class="card-title text-center">Model: {{car.model}}, Godina: {{car.year}}</h5>
+    <p class="card-text text-center">Cijena po danu: {{car.cijenaPoDanu}} Cijena po satu: {{car.pricePerHour}}kn, Cijena po tjednu: {{car.pricePerWeek}}kn</p>
+    <p class="card-text text-center"><small class="text-muted">{{car.location}}</small></p>
     <br>
-    <a href="/kontaktOwner/{{car.owner}}" class="btn btn-primary btn-1">Kontaktiraj vlasnika</a>
-    <br>
-    <a href="/RentCar/{{car._id}}" class="btn btn-danger btn-1">Rent a car</a> 
+    <p class="text-center">
+    <a href="/kontaktOwner/{{car.owner}}" class="btn btn-primary btn-1 text-center">Kontaktiraj vlasnika</a>
+<br>
+    <a href="/RentCar/{{car._id}}" class="btn btn-danger btn-1">Rent a car</a> </p>
     </div>
-</div>
+  </div>
 </div>

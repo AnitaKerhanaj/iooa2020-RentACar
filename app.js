@@ -49,7 +49,7 @@ const Contact=require('./models/contact');
 const Car=require('./models/car');
 const car = require('./models/car');
 const Chat=require('./models/chat');
-const Budjet=require('./models/budjet');
+const Rezervacija=require('./models/rezervacija');
 const { parse } = require('path');
 
 //povezivanje s bazom MongoDB
@@ -225,8 +225,7 @@ app.post('/listCar2',requireLogin, (req,res)=>{
         let imageUrl={
             imageUrl:`https://rentt-app.s3.amazonaws.com/${req.body.image}`
         };
-        car.pricePerHour=req.body.pricePerHour;
-        car.pricePerWeek=req.body.pricePerWeek;
+        car.cijenaPoDanu=req.body.cijenaPoDanu;
         car.location=req.body.location;
         car.slikainfo= `https://rentt-app.s3.amazonaws.com/${req.body.image}`;
         car.image.push(imageUrl);
@@ -319,31 +318,31 @@ app.post('/izracunajUkupno/:id', (req,res)=>{
     Car.findOne({_id:req.params.id})
     .then((car)=>{
         console.log(req.body);
+        var dan=parseInt(req.body.dan);
         var sat=parseInt(req.body.sat);
         var tjedan=parseInt(req.body.tjedan);
         //console.log('Tip sat je ', typeof(hour));
-        var ukupnoSati=sat*car.pricePerHour;
-        var ukupnoTjedana=tjedan*car.pricePerWeek;
-        var ukupno=ukupnoSati+ukupnoTjedana;
+        var ukupnoDana=dan*car.cijenaPoDanu;
+        var ukupno=ukupnoDana;
         console.log('Ukupno: ', ukupno);
-        //KREIRANJE BUDETA
-        const budjet={
+        //KREIRANJE REZERVACIJE
+        const rezervacija={
             carID: req.params.id,
             ukupno:ukupno,
             renter: req.user._id,
             date:new Date()
         }
-        new Budjet(budjet).save((err,budjet)=>{
+        new Rezervacija(rezervacija).save((err,rezervacija)=>{
             if(err){
                 console.log(err);
             }
-            if(budjet){
+            if(rezervacija){
                 Car.findOne({_id:req.params.id})
                 .then((car)=>{
                     //ukupno racunanje za stripe
-                    var stripeUkupno=budjet.ukupno*100;
+                    var stripeUkupno=rezervacija.ukupno*100;
                     res.render('checkout',{
-                        budjet:budjet,
+                        rezervacija:rezervacija,
                         car:car,
                         StripePublishableKey:keys.StripePublishableKey,
                         stripeUkupno:stripeUkupno
@@ -355,10 +354,10 @@ app.post('/izracunajUkupno/:id', (req,res)=>{
 })
 //naplacivanje kupcu
 app.post('/placanje/:id', (req,res)=>{
-    Budjet.findOne({_id:req.params.id})
+    Rezervacija.findOne({_id:req.params.id})
     .populate('renter')
-    .then((budjet)=>{
-        const amount=budjet.ukupno*100;
+    .then((rezervacija)=>{
+        const amount=rezervacija.ukupno*100;
         stripe.customers.create({
             email: req.body.stripeEmail,
             source: req.body.stripeToken
@@ -366,7 +365,7 @@ app.post('/placanje/:id', (req,res)=>{
         .then((customer)=>{
             stripe.charges.create({
                 amount:amount,
-                description:`${budjet.ukupno}kn za iznajmljivanje auta`,
+                description:`${rezervacija.ukupno}kn za iznajmljivanje auta`,
                 currency: 'usd',
                 customer:customer.id,
                 receipt_email: customer.email
@@ -378,7 +377,7 @@ app.post('/placanje/:id', (req,res)=>{
                     console.log(charge);
                     res.render('uspjesno', {
                         charge:charge,
-                        budjet:budjet
+                        rezervacija:rezervacija
                     })
                 }
             })

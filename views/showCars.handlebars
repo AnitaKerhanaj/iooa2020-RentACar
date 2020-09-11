@@ -1,24 +1,25 @@
-<div class="container card text-white bg-dark mb-3 card border-dark mb-3" >
+<div class="container card text-white bg-dark mb-3 card border-dark mb-3" style="max-width: 40rem;">
 {{#each cars}}
 <a href="/prikaziAuto/{{_id}}">
-<div class="media">
+<div class="media center">
   <input type="hidden" id="carID" value="{{_id}}">
     <div class="media-body">
-    <h5 class="mt-0">{{make}} {{model}} {{year}}</h5>
+    <h3 class="text-uppercase">{{make}} - {{model}} - {{year}}</h3>
     <div class="row">
         {{#each image}}
         <div class="col-sm">
-            <img src="{{imageUrl}}" class="img-fluid" width="300px;" height="auto">
+            <img src="{{imageUrl}}" class="img-fluid" width="500px;" height="auto">
         </div>
         {{else}}
         <img src="/image/logo.png" alt="">
         {{/each}}
     </div>
     </a>
-    <p><u>{{pricePerHour}}</u> kn po satu</p>
-    <p><u>{{pricePerWeek}}</u> kn po tjednu</p>
-    <small>{{location}}</small>
-    <small>{{date}}</small>
+    <blockquote class="blockquote text-center">
+    <p class="mb-0">{{pricePerHour}} kn po satu</p>
+    <p>{{pricePerWeek}} kn po tjednu</p>
+    <footer class="blockquote-footer"><small>{{location}}; {{date}}</small></footer>
+    </blockquote>
   </div>
   </div>
 

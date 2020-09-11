@@ -18,10 +18,7 @@ const carSchema=new Schema({
     type: {
         type: String
     },
-    pricePerWeek: {
-        type: Number
-    },
-    pricePerHour: {
+    cijenaPoDanu: {
         type: Number
     },
     image: [{
