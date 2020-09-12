@@ -6,13 +6,13 @@ const carSchema=new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    make: {
+    auto: {
         type: String
     },
     model: {
         type: String
     },
-    year: {
+    godina: {
         type: Number
     },
     type: {

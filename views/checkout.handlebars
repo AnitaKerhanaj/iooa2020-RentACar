@@ -4,7 +4,7 @@
             <div class="card text-white bg-dark mb-3 card border-dark mb-3" style="width: 18rem;">
                 <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title">{{car.make}} {{car.model}}</h5>
+                    <h5 class="card-title">{{car.auto}} {{car.model}}</h5>
                     <p class="card-text">{{car.cijenaPoDanu}} /dan</p>
                     <a href="/prikaziAuto/{{car._id}}" 
                     class="btn btn-primary">Kontakt vlasnika</a>
@@ -22,7 +22,7 @@
              data-key="{{StripePublishableKey}}" class="stripe-button" 
              data-amount="{{stripeUkupno}}"
              data-name="Car Rental" 
-             data-description="{{rezervacija.ukupno}} kn za iznajmljivanje {{car.make}} {{car.model}}"
+             data-description="{{rezervacija.ukupno}} kn za iznajmljivanje {{car.auto}} {{car.model}}"
              data-image="/image/logo.png"></script>
             
             </form>

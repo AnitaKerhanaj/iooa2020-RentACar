@@ -4,7 +4,7 @@
             <div class="card text-white bg-dark mb-3 card border-dark mb-3" style="width: 18rem;">
                 <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title">{{car.make}} {{car.model}}</h5>
+                    <h5 class="card-title">{{car.auto}} {{car.model}}</h5>
                     <p class="card-text">{{car.cijenaPoDanu}} /dan</p>
                     <a href="/prikaziAuto/{{car._id}}" 
                     class="btn btn-primary">Kontakt vlasnika</a>
@@ -35,6 +35,7 @@
                 <div class="form-group">
                     <button type="submit" class="form-control btn btn-danger">Izracunaj ukupnu cijenu</button>
                 </div>
+                <a href="/showCars" class="btn btn-primary btn-1">Natrag na listu automobila</a> </p>
             </div>
             </form>
         </div>

@@ -202,9 +202,9 @@ app.get('/listCar',requireLogin, (req,res)=>{
 app.post('/listCar', requireLogin, (req,res)=>{
     const newCar={
         owner: req.user._id,
-        make: req.body.make,
+        auto: req.body.auto,
         model: req.body.model,
-        year: req.body.year,
+        godina: req.body.godina,
         type: req.body.type
     }
     new Car(newCar).save((err,car)=>{
@@ -319,9 +319,6 @@ app.post('/izracunajUkupno/:id', (req,res)=>{
     .then((car)=>{
         console.log(req.body);
         var dan=parseInt(req.body.dan);
-        var sat=parseInt(req.body.sat);
-        var tjedan=parseInt(req.body.tjedan);
-        //console.log('Tip sat je ', typeof(hour));
         var ukupnoDana=dan*car.cijenaPoDanu;
         var ukupno=ukupnoDana;
         console.log('Ukupno: ', ukupno);

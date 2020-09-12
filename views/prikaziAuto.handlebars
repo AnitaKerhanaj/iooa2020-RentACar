@@ -2,16 +2,18 @@
   
   <img src="{{car.slikainfo}}" class="card-img-top" alt="...">
   <div class="card-body">
-    <h3 class="card-title text-center">{{car.make}}</h3>
-    <h5 class="card-title text-center">Model: {{car.model}}, Godina: {{car.year}}</h5>
+    <h3 class="card-title text-center">{{car.auto}}</h3>
+    <h5 class="card-title text-center">Model: {{car.model}}, Godina: {{car.godina}}</h5>
     <p class="card-text text-center">Cijena po danu: {{car.cijenaPoDanu}}kn</p>
     <p class="card-text text-center"><small class="text-muted">{{car.location}}</small></p>
     <br>
     <p class="text-center">Molimo kontaktirajte vlasnika prije iznajmljivanja automobila</p>
     <p class="text-center">  
     <a href="/kontaktOwner/{{car.owner}}" class="btn btn-primary btn-1 text-center">Kontaktiraj vlasnika</a>
-<br>
-    <a href="/RentCar/{{car._id}}" class="btn btn-danger btn-1">Rent a car</a> </p>
+    <br>
+    <a href="/RentCar/{{car._id}}" class="btn btn-danger btn-1">Rent a car</a> 
+    <br>
+    <a href="/showCars" class="btn btn-primary btn-1">Natrag na listu automobila</a> </p>
     </div>
   </div>
 </div>
